@@ -1,5 +1,3 @@
-#Cahier des charges
-
 Victoria Ançay Ludivine Rouiller
 
 Le cahier des charges initial est complet et reflète les fonctionnalités
