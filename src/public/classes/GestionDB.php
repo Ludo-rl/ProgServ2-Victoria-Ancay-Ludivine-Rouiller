@@ -1,5 +1,5 @@
 <?php
-class CoursRepository {
+class GestionDB {
     private PDO $pdo;
 
     public function __construct(PDO $pdo) {
