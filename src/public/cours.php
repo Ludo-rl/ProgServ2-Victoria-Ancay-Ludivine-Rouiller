@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../classes/Cours.php';
-require_once __DIR__ . '/../classes/CoursRepository.php';
+require_once __DIR__ . '/../classes/GestionDB.php';
 
 session_start();
 // TEMPORAIRE : simule la connexion de Victoria (id 1 dans seed.sql).
@@ -9,7 +9,7 @@ session_start();
 $_SESSION['id_eleve'] ??= 1;
 $idEleve = (int) $_SESSION['id_eleve'];
 
-$repository = new CoursRepository($pdo);
+$repository = new GestionDB($pdo);
 
 $couleurs = [];
 $cours = [];
