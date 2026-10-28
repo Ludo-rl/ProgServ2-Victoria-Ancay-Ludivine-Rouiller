@@ -1,5 +1,5 @@
 <?php
-const DB_HOST = 'mariadb';
+/*const DB_HOST = 'mariadb';
 const DB_PORT = 3306;
 const DB_NAME = 'my_database';
 const DB_USER = 'username';
@@ -7,7 +7,15 @@ const DB_PASSWORD = 'password';
 
 $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
 
-$pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
+$pdo = new PDO($dsn, DB_USER, DB_PASSWORD); */
+
+$config = require __DIR__ . '/../config.php';
+
+const DB_PORT = 3306;
+
+$dsn = "mysql:host=" . $config['db_host'] . ";port=" . DB_PORT . ";dbname=" . $config['db_name'] . ";charset=utf8mb4";
+
+$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 
 $sql = "SELECT * FROM my_table";
 
