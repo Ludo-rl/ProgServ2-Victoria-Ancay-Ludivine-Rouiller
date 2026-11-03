@@ -6,7 +6,7 @@ class GestionDB {
         $this->pdo = $pdo;
     }
 
-    // Palette de couleurs
+    //couleurs
     public function trouverCouleurs(): array {
         $stmt = $this->pdo->prepare("SELECT id_couleur, nom, code_hex FROM couleur ORDER BY id_couleur");
         $stmt->execute();
@@ -27,7 +27,7 @@ class GestionDB {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Création d'un cours (requête préparée : pas d'injection SQL possible)
+    // Création d'un cours et PDO
     public function creer(Cours $cours): void {
         $sql = "INSERT INTO cours (nom, id_eleve, id_couleur)
                 VALUES (:nom, :id_eleve, :id_couleur)";
