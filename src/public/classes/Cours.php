@@ -1,6 +1,6 @@
 <?php
 class Cours {
-    // Constante de classe : même limite que VARCHAR(100) dans la base
+    // VARCHAR(100) DB
     public const NOM_LONGUEUR_MAX = 100;
 
     private string $nom;
