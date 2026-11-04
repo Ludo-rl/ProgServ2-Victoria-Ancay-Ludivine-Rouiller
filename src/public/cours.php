@@ -1,32 +1,33 @@
 <?php
 require_once __DIR__ . '/classes/Cours.php';
 require_once __DIR__ . '/classes/GestionDB.php';
+require_once __DIR__ . '/classes/CoursManager.php';
 
 session_start();
-// TEMPORAIRE : simule la connexion de Victoria (id 1 dans seed.sql).
-// À remplacer par la vraie vérification quand la page de connexion existera.
-$_SESSION['id_eleve'] ??= 1;
+$_SESSION['id_eleve'] ??= 1;   // TEMPORAIRE active session en attendant vrai connexion
 $idEleve = (int) $_SESSION['id_eleve'];
 
-$repository = new GestionDB();
-$pdo = $repository->getPdo();
+$gestionDB = new GestionDB();
+$coursManager = new CoursManager($gestionDB->getPdo());
+
+//$repository = $coursManager;
 
 $couleurs = [];
 $cours = [];
 $erreur = "";
-$nom = "";          // conservés pour réafficher le formulaire en cas d'erreur
+$nom = "";          // réafficher le formulaire en cas d'erreur
 $idCouleur = 0;
 
 try {
-    $couleurs = $repository->trouverCouleurs();
+    $couleurs = $coursManager->trouverCouleurs();
     $idsValides = array_column($couleurs, 'id_couleur');
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // NETTOYAGE : on retire les espaces autour du nom
+        // NETTOYAGE 
         $nom = trim($_POST["nom"] ?? "");
         $idCouleur = (int) ($_POST["id_couleur"] ?? 0);
 
-        // VALIDATION côté serveur
+        // val serveur
         if ($nom === "") {
             $erreur = "Renseignez un nom pour créer votre cours.";
         } elseif (mb_strlen($nom) > Cours::NOM_LONGUEUR_MAX) {
@@ -34,20 +35,18 @@ try {
         } elseif (!in_array($idCouleur, $idsValides)) {
             $erreur = "Choisissez une couleur dans la palette.";
         } else {
-            $repository->creer(new Cours($nom, $idEleve, $idCouleur));
-            header("Location: cours.php?ok=1");   // évite le double envoi au rechargement
+            // $coursManager->creer(new Cours($nom, $idEleve, $idCouleur, null));
+            header("Location: cours.php?ok=1"); // IA sert a pas avoir de page blanche
             exit;
         }
     }
 
-    $cours = $repository->trouverParEleve($idEleve);
+    $cours = $coursManager->trouverParEleve($idEleve);
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) {
-        // Violation de UNIQUE (id_eleve, nom)
         $erreur = "Vous avez déjà un cours avec ce nom.";
-        $cours = $repository->trouverParEleve($idEleve);
+        $cours = $coursManager->trouverParEleve($idEleve);
     } else {
-        // On ne montre jamais le détail technique à l'utilisateur
         error_log($e->getMessage());
         $erreur = "Une erreur est survenue. Réessayez plus tard.";
     }
@@ -78,7 +77,7 @@ try {
     <h2>Ajouter un cours</h2>
     <form action="cours.php" method="POST">
         <label for="nom">Nom de la branche</label><br>
-        <!-- Validation côté client : confort uniquement, la vraie validation est côté serveur -->
+
         <input type="text" id="nom" name="nom" required
             maxlength="<?= Cours::NOM_LONGUEUR_MAX ?>"
             value="<?= htmlspecialchars($nom) ?>">
