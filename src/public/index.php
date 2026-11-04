@@ -1,16 +1,9 @@
 <?php
-const DB_HOST = 'be9lj1.myd.infomaniak.com';
-const DB_PORT = 3306;
-const DB_NAME = 'be9lj1_centralMDB';
-const DB_USER = 'be9lj1_VicLudo';
-const DB_PASSWORD = 'Victoria_Ludivine26';
-
-$dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-
-$pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
-
+require_once 'classes/GestionDB.php';
 
 $sql = "SELECT * FROM eleve";
+$repository = new GestionDB();
+$pdo = $repository->getPdo();
 
 $stmt = $pdo->prepare($sql);
 
@@ -23,9 +16,11 @@ $results = $stmt->fetchAll();
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProgServ2 Course PHP Template</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Central</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>

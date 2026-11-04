@@ -1,9 +1,15 @@
 <?php
+require_once '../config.php';
 class GestionDB {
     private PDO $pdo;
 
-    public function __construct(PDO $pdo) {
-        $this->pdo = $pdo;
+    public function __construct() {
+        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $this->pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
+        }
+
+    public function getPdo(): PDO {
+        return $this->pdo;
     }
 
     //couleurs

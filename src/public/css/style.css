@@ -1,0 +1,1587 @@
+/* ==========================================================================
+   Central — feuille de style
+   Projet ProgServ2 · HEIG-VD
+   Basée sur les maquettes (Maquette ProgServ2.zip) : les couleurs et les
+   dimensions ont été relevées directement sur les images.
+
+   SOMMAIRE
+    1. Variables (couleurs, rayons, police)
+    2. Base (reset, typographie, icônes)
+    3. Structure de l'application (barre latérale + contenu)
+    4. Barre latérale
+    5. En-tête de page, fil d'Ariane, pied de page
+    6. Cartes, bandeaux et pastilles
+    7. Boutons
+    8. Formulaires
+    9. Alertes et encadrés d'information
+   10. Pages de connexion et d'inscription
+   11. Accueil : tuiles de cours
+   12. Profil
+   13. Gestion d'un cours (palette de couleurs, suppression)
+   14. Résumés (liste, dépôt de fichier)
+   15. Partage de l'espace
+   16. Adaptation aux petits écrans
+
+   Police : la maquette utilise « Inter ». Pour l'afficher, ajouter dans le
+   <head> de chaque page :
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+   Sans cela, le navigateur utilise la police système (sans-serif).
+
+   Couleur d'un cours : elle vient de la base de données. On la transmet à la
+   page avec une variable CSS, par exemple :
+   <a class="course-card" style="--course-color: #dfead8"> ... </a>
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Variables
+   ========================================================================== */
+:root {
+	/* Couleurs relevées sur les maquettes */
+	--color-bg: #f7f8f4; /* fond des pages de l'espace élève */
+	--color-surface: #ffffff; /* cartes, barre latérale, formulaires */
+	--color-border: #e2e7de; /* bordures fines */
+	--color-sand: #f0ede3; /* bandeaux, avatars, tuile « Ajouter » */
+	--color-sage-tint: #e8f0e7; /* fond vert très clair (menu actif, infos) */
+	--color-primary: #376b55; /* vert principal (boutons, liens, icônes) */
+	--color-primary-hover: #2e5a47;
+	--color-text: #263b34; /* titres et texte */
+	--color-muted: #647168; /* texte secondaire */
+	--color-placeholder: #77827b;
+
+	--color-danger: #ab4d40;
+	--color-danger-hover: #94402f;
+	--color-danger-bg: #fcf0ec;
+	--color-danger-border: #ebcfc7;
+	--color-danger-soft: #946151; /* bouton « Retirer » */
+	--color-warning-bg: #f6f0e3; /* badge « En attente » */
+	--color-warning-text: #866a37;
+
+	/* Palette de couleurs de cours proposée dans le formulaire */
+	--swatch-sage: #dfead8; /* vert sauge */
+	--swatch-peach: #f5e0d2;
+	--swatch-lilac: #e7e1f2;
+	--swatch-sky: #dfeaf0;
+	--swatch-butter: #f5edcf;
+
+	/* Formes */
+	--radius-s: 12px;
+	--radius-m: 16px;
+	--radius-l: 24px;
+
+	/* Dimensions */
+	--sidebar-width: 224px;
+
+	--font:
+		"Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+		Arial, sans-serif;
+}
+
+/* ==========================================================================
+   2. Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: var(--font);
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--color-text);
+	background: var(--color-bg);
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure {
+	margin: 0;
+}
+
+ul,
+ol {
+	padding: 0;
+	list-style: none;
+}
+
+a {
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	color: inherit;
+}
+
+button {
+	cursor: pointer;
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 2px;
+}
+
+/* Icônes SVG en traits (style des maquettes) */
+.icon {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.75;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.icon--lg {
+	width: 28px;
+	height: 28px;
+}
+
+/* Texte lu par les lecteurs d'écran mais invisible à l'écran */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ==========================================================================
+   3. Structure de l'application
+   Une colonne à gauche (barre latérale) et le contenu à droite.
+   ========================================================================== */
+.app {
+	display: grid;
+	grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+	min-height: 100vh;
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	padding: 32px 44px 28px;
+}
+
+.main__content {
+	flex: 1;
+}
+
+/* Page d'un cours : fond blanc, barre latérale teintée de la couleur du cours */
+.app--course,
+.app--course .main {
+	background: var(--color-surface);
+}
+
+/* Deux colonnes : contenu principal + colonne d'aide à droite (330 px) */
+.layout-2col {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 330px;
+	gap: 24px;
+	align-items: start;
+}
+
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+/* ==========================================================================
+   4. Barre latérale
+   ========================================================================== */
+.sidebar {
+	position: sticky;
+	top: 0;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	padding: 24px;
+	overflow-y: auto;
+	background: var(--color-surface);
+	border-right: 1px solid var(--color-border);
+}
+
+/* Logo « Central » */
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--color-text);
+	font-size: 22px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.brand:hover {
+	text-decoration: none;
+}
+
+.brand__logo {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 9px;
+	color: #fff;
+	background: var(--color-primary);
+}
+
+.brand__logo .icon {
+	width: 20px;
+	height: 20px;
+}
+
+.sidebar__label {
+	margin: 36px 0 8px;
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--color-muted);
+}
+
+/* Menu de navigation */
+.nav {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.nav__item {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	height: 46px;
+	padding: 0 14px;
+	border-radius: var(--radius-s);
+	color: var(--color-muted);
+	font-size: 14px;
+}
+
+.nav__item:hover {
+	text-decoration: none;
+	background: var(--color-sage-tint);
+}
+
+/* Page courante : utiliser la classe is-active ou aria-current="page" */
+.nav__item.is-active,
+.nav__item[aria-current="page"] {
+	color: var(--color-primary);
+	font-weight: 600;
+	background: var(--color-sage-tint);
+}
+
+/* Bas de la barre latérale : note, utilisateur, déconnexion */
+.sidebar__footer {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	margin-top: auto;
+	padding-top: 24px;
+}
+
+.privacy-note {
+	padding: 16px;
+	border-radius: var(--radius-m);
+	background: var(--color-bg);
+}
+
+.privacy-note .icon {
+	color: var(--color-primary);
+}
+
+.privacy-note strong {
+	display: block;
+	margin: 10px 0 12px;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.55;
+}
+
+.privacy-note p {
+	font-size: 11px;
+	line-height: 1.55;
+	color: var(--color-muted);
+}
+
+.user {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.user__name {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.user__email {
+	font-size: 11px;
+	line-height: 1.3;
+	color: var(--color-muted);
+}
+
+.logout {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 13px;
+	color: var(--color-muted);
+}
+
+.logout:hover {
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+/* Rond avec une initiale (utilisateur, personnes invitées) */
+.avatar {
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-primary);
+	background: var(--color-sand);
+}
+
+.avatar--sage {
+	background: var(--color-sage-tint);
+}
+
+/* Variante : barre latérale d'un cours, teintée de la couleur du cours */
+.sidebar--course {
+	background: var(--course-color, var(--color-sage-tint));
+	border-right: 0;
+	border-radius: 0 var(--radius-l) var(--radius-l) 0;
+}
+
+.sidebar__course-title {
+	margin: 84px 0 70px;
+	font-size: 30px;
+	font-weight: 400;
+	line-height: 1.2;
+	text-align: center;
+	word-break: break-word;
+}
+
+.sidebar--course .sidebar__label {
+	margin-top: 0;
+}
+
+.sidebar--course .nav__item {
+	color: var(--color-primary);
+	font-weight: 600;
+	background: var(--color-sage-tint);
+}
+
+.sidebar--course .nav__item:hover {
+	background: #fff;
+}
+
+/* ==========================================================================
+   5. En-tête de page, fil d'Ariane, pied de page
+   ========================================================================== */
+.page-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+	margin-bottom: 30px;
+}
+
+.breadcrumb {
+	margin-bottom: 8px;
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.breadcrumb a {
+	color: inherit;
+}
+
+.page-title {
+	font-size: 34px;
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	color: var(--color-text);
+}
+
+.page-lead {
+	margin-top: 12px;
+	color: var(--color-muted);
+}
+
+/* Lien de retour (« ← Mes cours ») */
+.back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 22px;
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.back-link .icon {
+	width: 16px;
+	height: 16px;
+}
+
+.app-footer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 8px 16px;
+	margin-top: 56px;
+	font-size: 11px;
+	color: var(--color-muted);
+}
+
+/* ==========================================================================
+   6. Cartes, bandeaux et pastilles
+   ========================================================================== */
+.card {
+	padding: 24px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-l);
+}
+
+.card__title {
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.card__subtitle {
+	margin-top: 6px;
+	font-size: 13px;
+	color: var(--color-muted);
+}
+
+/* Bandeau en haut des pages (profil, cours, partage) */
+.banner {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	margin-bottom: 28px;
+	padding: 24px 28px;
+	border-radius: var(--radius-l);
+	background: var(--color-sand);
+}
+
+.banner__avatar {
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	font-size: 28px;
+	color: var(--color-primary);
+	background: #fff;
+}
+
+.banner__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.banner__title {
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.banner__text {
+	font-size: 14px;
+	color: var(--color-muted);
+}
+
+/* Version plus basse (partage, cours) */
+.banner--compact {
+	padding: 16px 28px;
+}
+
+.banner--compact .banner__avatar {
+	width: 52px;
+	height: 52px;
+	font-size: 22px;
+}
+
+.banner--compact .banner__title {
+	font-size: 20px;
+}
+
+.banner--compact .banner__text {
+	font-size: 13px;
+}
+
+/* Bandeau d'un cours : prend la couleur du cours */
+.banner--course {
+	background: var(--course-color, var(--swatch-sage));
+}
+
+.banner--course .banner__title {
+	font-size: 20px;
+}
+
+.banner--course .banner__text {
+	font-size: 12px;
+}
+
+.banner__icon {
+	flex-shrink: 0;
+	color: var(--color-primary);
+}
+
+/* Petite pastille blanche (« Compte élève », « Propriétaire · vous ») */
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 32px;
+	padding: 0 14px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--color-primary);
+	background: #fff;
+	white-space: nowrap;
+}
+
+.pill .icon {
+	width: 14px;
+	height: 14px;
+}
+
+.pill--text {
+	padding: 0;
+	background: none;
+	font-weight: 400;
+}
+
+/* Badge de statut (« Accès actif », « En attente ») */
+.badge {
+	display: inline-block;
+	padding: 3px 11px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+}
+
+.badge--active {
+	color: var(--color-primary);
+	background: var(--color-sage-tint);
+}
+
+.badge--pending {
+	color: var(--color-warning-text);
+	background: var(--color-warning-bg);
+}
+
+/* ==========================================================================
+   7. Boutons
+   ========================================================================== */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	height: 46px;
+	padding: 0 20px;
+	border: 1px solid transparent;
+	border-radius: var(--radius-s);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+	transition:
+		background-color 0.15s,
+		border-color 0.15s,
+		color 0.15s;
+}
+
+.btn:hover {
+	text-decoration: none;
+}
+
+/* Bouton principal vert */
+.btn--primary {
+	color: #fff;
+	background: var(--color-primary);
+}
+
+.btn--primary:hover {
+	background: var(--color-primary-hover);
+}
+
+/* Bouton blanc avec bordure */
+.btn--outline {
+	color: var(--color-primary);
+	background: #fff;
+	border-color: var(--color-border);
+}
+
+.btn--outline:hover {
+	background: var(--color-bg);
+}
+
+/* Bouton rouge (action définitive) */
+.btn--danger {
+	color: #fff;
+	background: var(--color-danger);
+}
+
+.btn--danger:hover {
+	background: var(--color-danger-hover);
+}
+
+/* Petit bouton (« Retirer », « Annuler » dans la liste d'invitations) */
+.btn--sm {
+	height: 34px;
+	padding: 0 16px;
+	border-radius: 10px;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.btn--sm-danger {
+	color: var(--color-danger-soft);
+}
+
+.btn--sm-muted {
+	color: var(--color-muted);
+}
+
+.btn--block {
+	display: flex;
+	width: 100%;
+}
+
+/* Bouton inactif (formulaire pas encore valide) */
+.btn:disabled,
+.btn.is-disabled {
+	color: var(--color-muted);
+	background: var(--color-border);
+	border-color: transparent;
+	cursor: not-allowed;
+}
+
+.btn-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+/* ==========================================================================
+   8. Formulaires
+   ========================================================================== */
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 18px;
+}
+
+.field__label {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* « Facultatif » à côté d'un libellé */
+.field__optional {
+	margin-left: 8px;
+	font-size: 12px;
+	font-weight: 400;
+	color: var(--color-muted);
+}
+
+.field__help {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.field__error {
+	font-size: 12px;
+	color: var(--color-danger);
+}
+
+.field__link {
+	align-self: flex-end;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.input {
+	display: block;
+	width: 100%;
+	height: 48px;
+	padding: 0 14px;
+	font-size: 14px;
+	background: #fff;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-s);
+}
+
+.input::placeholder {
+	color: var(--color-placeholder);
+}
+
+.input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+/* Champ en erreur : ajouter is-invalid (ou aria-invalid="true") */
+.input.is-invalid,
+.input[aria-invalid="true"] {
+	border-color: var(--color-danger);
+}
+
+.input.is-invalid:focus,
+.input[aria-invalid="true"]:focus {
+	box-shadow: inset 0 0 0 1px var(--color-danger);
+}
+
+.input--soft {
+	background: var(--color-bg);
+}
+
+/* Champ avec une icône à gauche et/ou un bouton à droite (afficher le mot de passe) */
+.input-wrap {
+	position: relative;
+}
+
+.input-wrap--icon .input {
+	padding-left: 44px;
+}
+
+.input-wrap--toggle .input {
+	padding-right: 48px;
+}
+
+.input-wrap__icon {
+	position: absolute;
+	top: 50%;
+	left: 14px;
+	color: var(--color-muted);
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.input-wrap__toggle {
+	position: absolute;
+	top: 50%;
+	right: 6px;
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: 8px;
+	color: var(--color-muted);
+	background: none;
+	transform: translateY(-50%);
+}
+
+.input-wrap__toggle:hover {
+	color: var(--color-text);
+}
+
+/* Faux menu « Lecture seule » (le seul rôle disponible) */
+.role-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	height: 46px;
+	padding: 0 18px;
+	border-radius: var(--radius-s);
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--color-primary);
+	background: var(--color-sage-tint);
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   9. Alertes et encadrés d'information
+   ========================================================================== */
+.alert {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 18px;
+	padding: 16px 18px;
+	border-radius: var(--radius-s);
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.alert .icon {
+	margin-top: 1px;
+}
+
+.alert__title {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.alert--danger {
+	color: var(--color-danger);
+	background: var(--color-danger-bg);
+}
+
+/* Encadré vert d'information (« Transformation à préciser ») */
+.alert--info {
+	margin: 0;
+	color: var(--color-muted);
+	background: var(--color-sage-tint);
+}
+
+.alert--info .alert__title,
+.alert--info .icon {
+	color: var(--color-primary);
+}
+
+/* Colonne de droite : cartes d'explication */
+.aside-card {
+	padding: 24px;
+	border-radius: var(--radius-l);
+	background: var(--color-sage-tint);
+}
+
+.aside-card > .icon {
+	width: 24px;
+	height: 24px;
+	color: var(--color-primary);
+}
+
+.aside-card__title {
+	margin: 14px 0 10px;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.aside-card p {
+	color: var(--color-muted);
+}
+
+.aside-card ul {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 14px;
+}
+
+.aside-card li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 12px;
+	color: var(--color-primary);
+}
+
+.aside-card li .icon {
+	width: 15px;
+	height: 15px;
+}
+
+/* Variante blanche et bordée (« Vous gardez le contrôle ») */
+.aside-card--plain {
+	background: #fff;
+	border: 1px solid var(--color-border);
+}
+
+.aside-card--plain .aside-card__title {
+	margin-top: 0;
+	font-size: 14px;
+}
+
+.aside-card--plain p {
+	font-size: 12px;
+	line-height: 1.55;
+}
+
+.aside-card--plain p + p {
+	margin-top: 12px;
+}
+
+/* ==========================================================================
+   10. Pages de connexion et d'inscription
+   ========================================================================== */
+.auth {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	padding: 48px 24px;
+	background: var(--color-surface);
+}
+
+.auth__panel {
+	width: 100%;
+	max-width: 480px;
+}
+
+/* Petit texte vert en capitales au-dessus du titre */
+.eyebrow {
+	margin-bottom: 14px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	color: var(--color-primary);
+}
+
+.auth__title {
+	font-size: 34px;
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+}
+
+.auth__lead {
+	margin: 14px 0 28px;
+	color: var(--color-muted);
+}
+
+.auth__note {
+	margin-top: 16px;
+	font-size: 12px;
+	text-align: center;
+	color: var(--color-muted);
+}
+
+.auth__alt {
+	margin-top: 22px;
+	font-size: 13px;
+	text-align: center;
+	color: var(--color-muted);
+}
+
+.auth__alt a {
+	margin-left: 4px;
+	font-weight: 600;
+}
+
+/* ==========================================================================
+   11. Accueil : tuiles de cours
+   ========================================================================== */
+.course-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	gap: 24px;
+	margin-top: 24px;
+}
+
+.course-card {
+	display: block;
+	color: var(--color-text);
+}
+
+.course-card:hover {
+	text-decoration: none;
+}
+
+.course-card__name {
+	display: block;
+	margin-bottom: 13px;
+	font-size: 20px;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+
+/* La couleur de la tuile vient de la variable --course-color */
+.course-card__tile {
+	display: grid;
+	place-items: center;
+	height: 118px;
+	border-radius: var(--radius-s);
+	background: var(--course-color, var(--color-sage-tint));
+	transition:
+		transform 0.15s,
+		box-shadow 0.15s;
+}
+
+.course-card:hover .course-card__tile {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(38, 59, 52, 0.12);
+}
+
+/* Tuile « Ajouter » */
+.course-card--add .course-card__tile {
+	color: var(--color-primary);
+	background: var(--color-sand);
+	border: 1px dashed var(--color-border);
+}
+
+.course-card--add .icon {
+	width: 32px;
+	height: 32px;
+	stroke-width: 1.5;
+}
+
+/* ==========================================================================
+   12. Profil
+   ========================================================================== */
+.info-item {
+	display: grid;
+	grid-template-columns: 36px minmax(0, 1fr);
+	padding: 18px 0;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.info-item:first-of-type {
+	margin-top: 8px;
+}
+
+.info-item > .icon {
+	margin-top: 1px;
+	color: var(--color-muted);
+}
+
+.info-item__label {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.info-item__value {
+	margin: 2px 0 6px;
+	font-size: 16px;
+}
+
+.info-item__help {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.info-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 18px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.info-link .icon {
+	width: 14px;
+	height: 14px;
+}
+
+/* ==========================================================================
+   13. Gestion d'un cours
+   ========================================================================== */
+.card__heading {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 18px;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.card__heading .icon {
+	width: 17px;
+	height: 17px;
+	color: var(--color-primary);
+}
+
+.card--form {
+	margin-bottom: 28px;
+}
+
+/* Palette de couleurs : une pastille ronde par couleur.
+   Chaque pastille est un bouton radio caché + un label stylé.
+   Couleur de la pastille : style="--swatch: #f5e0d2" */
+.swatches {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.swatch-option {
+	position: relative;
+}
+
+.swatch {
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	color: var(--color-primary);
+	background: var(--swatch);
+	cursor: pointer;
+}
+
+.swatch .icon {
+	display: none;
+	width: 16px;
+	height: 16px;
+	stroke-width: 2.25;
+}
+
+.swatch-option input:checked + .swatch {
+	border-color: var(--color-primary);
+}
+
+.swatch-option input:checked + .swatch .icon {
+	display: block;
+}
+
+.swatch-option input:focus-visible + .swatch {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 3px;
+}
+
+/* Zone de suppression d'un cours */
+.danger-zone {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 24px;
+	color: var(--color-text);
+	background: var(--color-danger-bg);
+	border: 1px solid var(--color-danger-border);
+	border-radius: var(--radius-l);
+}
+
+.danger-zone__title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 12px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--color-danger);
+}
+
+.danger-zone__tag {
+	margin-top: 12px;
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--color-danger);
+}
+
+.danger-zone__actions {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	flex-shrink: 0;
+	width: 230px;
+}
+
+/* ==========================================================================
+   14. Résumés
+   ========================================================================== */
+.layout-resumes {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 368px;
+	gap: 24px;
+	align-items: start;
+}
+
+.list-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.list-header__title {
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.list-header__count {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.resume-list {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.resume-card {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	padding: 22px 22px;
+	color: var(--color-text);
+	background: #fff;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-l);
+	transition:
+		border-color 0.15s,
+		box-shadow 0.15s;
+}
+
+.resume-card:hover {
+	text-decoration: none;
+	border-color: #cfd8cb;
+	box-shadow: 0 4px 14px rgba(38, 59, 52, 0.06);
+}
+
+.resume-card__icon {
+	display: grid;
+	place-items: center;
+	flex-shrink: 0;
+	width: 44px;
+	height: 44px;
+	border-radius: var(--radius-s);
+	color: var(--color-primary);
+	background: var(--color-sage-tint);
+}
+
+.resume-card__title {
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.resume-card__meta {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.list-note {
+	margin-top: 18px;
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+/* Panneau « Ajouter un fichier » */
+.upload-panel__title {
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.dropzone {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	margin-top: 22px;
+	padding: 28px 16px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--color-muted);
+	background: var(--color-bg);
+	border: 1px dashed var(--color-border);
+	border-radius: var(--radius-m);
+}
+
+.dropzone .icon {
+	width: 24px;
+	height: 24px;
+	color: var(--color-primary);
+}
+
+/* Fichier choisi, pas encore envoyé */
+.file-chip {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 20px 0;
+	padding: 12px 14px;
+	background: #fff;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-s);
+}
+
+.file-chip > .icon {
+	color: var(--color-primary);
+}
+
+.file-chip__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.file-chip__name {
+	font-size: 12px;
+	line-height: 1.4;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.file-chip__state {
+	font-size: 11px;
+	line-height: 1.4;
+	color: var(--color-muted);
+}
+
+.file-chip__remove {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 6px;
+	color: var(--color-muted);
+	background: none;
+}
+
+.file-chip__remove:hover {
+	background: var(--color-bg);
+	color: var(--color-text);
+}
+
+.upload-panel .alert {
+	margin-top: 20px;
+}
+
+/* ==========================================================================
+   15. Partage de l'espace
+   ========================================================================== */
+/* Formulaire d'invitation : e-mail | rôle | bouton */
+.invite-form {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto auto;
+	gap: 12px;
+	align-items: end;
+	margin-top: 18px;
+}
+
+.invite-form .field {
+	margin-bottom: 0;
+}
+
+.invite-form .field__label {
+	font-size: 12px;
+}
+
+.invite-form .input {
+	height: 46px;
+	font-size: 13px;
+}
+
+.invite-note {
+	margin-top: 18px;
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+.card__header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.card__header .card__title {
+	font-size: 20px;
+}
+
+.card__meta {
+	font-size: 12px;
+	color: var(--color-muted);
+}
+
+/* Liste des personnes et invitations */
+.people {
+	margin-top: 18px;
+}
+
+.person {
+	display: grid;
+	grid-template-columns: 36px minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: 14px;
+	padding: 14px 0;
+	border-top: 1px solid var(--color-border);
+}
+
+.person__name {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.35;
+}
+
+.person__email {
+	font-size: 12px;
+	line-height: 1.35;
+	color: var(--color-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.person__status {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 3px;
+	font-size: 11px;
+	color: var(--color-muted);
+}
+
+.people + .list-note {
+	margin-top: 4px;
+}
+
+/* ==========================================================================
+   16. Adaptation aux petits écrans
+   ========================================================================== */
+@media (max-width: 1100px) {
+	.layout-2col,
+	.layout-resumes {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (max-width: 860px) {
+	.app {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* La barre latérale devient une barre horizontale en haut de page */
+	.sidebar {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px 20px;
+		height: auto;
+		padding: 14px 20px;
+		border-right: 0;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.sidebar--course {
+		border-radius: 0 0 var(--radius-l) var(--radius-l);
+	}
+
+	.sidebar__label,
+	.privacy-note,
+	.user {
+		display: none;
+	}
+
+	.sidebar__course-title {
+		order: -1;
+		width: 100%;
+		margin: 4px 0;
+		font-size: 24px;
+		text-align: left;
+	}
+
+	.nav {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.nav__item {
+		height: 40px;
+	}
+
+	.sidebar__footer {
+		margin: 0 0 0 auto;
+		padding: 0;
+	}
+
+	.main {
+		padding: 24px 20px;
+	}
+
+	.page-title,
+	.auth__title {
+		font-size: 28px;
+	}
+
+	.page-header {
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.banner {
+		flex-wrap: wrap;
+		padding: 20px;
+	}
+
+	.invite-form {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.person {
+		grid-template-columns: 36px minmax(0, 1fr) auto;
+	}
+
+	.person__status {
+		grid-column: 2;
+		grid-row: 2;
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.danger-zone {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.danger-zone__actions {
+		width: 100%;
+	}
+
+	.app-footer {
+		margin-top: 40px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+	}
+}
