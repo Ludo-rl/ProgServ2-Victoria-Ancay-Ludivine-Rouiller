@@ -13,8 +13,12 @@ class CoursManager {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+
+    // Les cours d'un élève (une liste d'objets Cours)
     public function trouverParEleve(int $idEleve): array {
-        $sql = "SELECT c.id_cours, c.nom, co.nom AS couleur, co.code_hex,
+        $sql = "SELECT c.id_cours, c.nom, c.id_eleve, c.id_couleur,
+                       co.nom AS couleur, co.code_hex,
                        (SELECT COUNT(*) FROM resume r WHERE r.id_cours = c.id_cours) AS nb_resumes
                 FROM cours c
                 JOIN couleur co ON co.id_couleur = c.id_couleur
@@ -23,17 +27,19 @@ class CoursManager {
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id_eleve', $idEleve);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
-    public function creer(Cours $cours): void {
-        $sql = "INSERT INTO cours (nom, id_eleve, id_couleur)
-                VALUES (:nom, :id_eleve, :id_couleur)";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':nom', $cours->getNom());
-        $stmt->bindValue(':id_eleve', $cours->getIdEleve());
-        $stmt->bindValue(':id_couleur', $cours->getIdCouleur());
-        $stmt->execute();
+        $listeCours = [];
+        while ($ligne = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // On crée un objet Cours avec les données de la ligne
+            $cours = new Cours(
+                $ligne["nom"],
+                (int) $ligne["id_eleve"],
+                (int) $ligne["id_couleur"],
+                (int) $ligne["id_cours"]
+            );
+            $listeCours[] = $cours;
+        }
+        return $listeCours;
     }
 
 
