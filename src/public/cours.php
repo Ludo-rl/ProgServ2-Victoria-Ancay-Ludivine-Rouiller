@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../classes/Cours.php';
-require_once __DIR__ . '/../classes/GestionDB.php';
+require_once __DIR__ . '/classes/Cours.php';
+require_once __DIR__ . '/classes/GestionDB.php';
 
 session_start();
 // TEMPORAIRE : simule la connexion de Victoria (id 1 dans seed.sql).
@@ -9,7 +8,8 @@ session_start();
 $_SESSION['id_eleve'] ??= 1;
 $idEleve = (int) $_SESSION['id_eleve'];
 
-$repository = new GestionDB($pdo);
+$repository = new GestionDB();
+$pdo = $repository->getPdo();
 
 $couleurs = [];
 $cours = [];
@@ -60,6 +60,8 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes cours · Central</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
