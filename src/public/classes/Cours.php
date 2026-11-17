@@ -4,7 +4,6 @@ class Cours {
     public const NOM_LONGUEUR_MAX = 100;
 
     private string $nom;
-    //private int $idCours;
     private int $idEleve;
     private int $idCouleur;
 
@@ -18,9 +17,6 @@ class Cours {
     public function getNom(): string {
         return $this->nom;
     }
-    /*public function getIdCours(): int {
-        return $this->idCours;
-    }*/
 
     public function getIdEleve(): int {
         return $this->idEleve;
