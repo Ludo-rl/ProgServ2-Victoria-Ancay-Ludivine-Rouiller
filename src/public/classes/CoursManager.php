@@ -7,7 +7,7 @@ class CoursManager {
         $this->pdo = $pdo;
     }
 
-    public function trouverCouleurs(): array {
+    public function findByColor(): array {
         $stmt = $this->pdo->prepare("SELECT id_couleur, nom, code_hex FROM couleur ORDER BY id_couleur");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -16,7 +16,7 @@ class CoursManager {
 
 
     // Les cours d'un élève (une liste d'objets Cours)
-    public function trouverParEleve(int $idEleve): array {
+    public function findByEleve(int $idEleve): array {
         $sql = "SELECT c.id_cours, c.nom, c.id_eleve, c.id_couleur,
                        co.nom AS couleur, co.code_hex,
                        (SELECT COUNT(*) FROM resume r WHERE r.id_cours = c.id_cours) AS nb_resumes
@@ -44,27 +44,47 @@ class CoursManager {
 
 
 
-    // Un seul cours, seulement a un eleve sinon false
-    public function trouverParId(int $idCours, int $idEleve): array|false {
-        $sql = "SELECT c.id_cours, c.nom, c.id_couleur,
-                       (SELECT COUNT(*) FROM resume r WHERE r.id_cours = c.id_cours) AS nb_resumes
-                FROM cours c
-                WHERE c.id_cours = :id_cours AND c.id_eleve = :id_eleve";
+    // Un seul cours, seulement s'il appartient à cet élève (sinon null)
+    public function findById(int $idCours, int $idEleve): ?Cours {
+        $sql = "SELECT id_cours, nom, id_eleve, id_couleur
+                FROM cours
+                WHERE id_cours = :id_cours AND id_eleve = :id_eleve";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id_cours', $idCours);
         $stmt->bindValue(':id_eleve', $idEleve);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $ligne = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($ligne === false) {
+            return null;   // le cours n'existe pas, ou n'appartient pas à cet élève
+        }
+        return new Cours(
+            $ligne["nom"],
+            (int) $ligne["id_eleve"],
+            (int) $ligne["id_couleur"],
+            (int) $ligne["id_cours"]
+        );
     }
 
-    // Modifie le nom et la couleur (le cours doit avoir un id) IA 
+
+    public function create(Cours $cours): void {
+        $sql = "INSERT INTO cours (nom, id_eleve, id_couleur)
+                VALUES (:nom, :id_eleve, :id_couleur)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':nom', $cours->getNom());
+        $stmt->bindValue(':id_eleve', $cours->getIdEleve());
+        $stmt->bindValue(':id_couleur', $cours->getIdCouleur());
+        $stmt->execute();
+    }
+
+    // Modifie le nom et la couleur (le cours doit avoir un id)
     public function modifier(Cours $cours): void {
         $sql = "UPDATE cours SET nom = :nom, id_couleur = :id_couleur
                 WHERE id_cours = :id_cours AND id_eleve = :id_eleve";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':nom', $cours->getNom());
         $stmt->bindValue(':id_couleur', $cours->getIdCouleur());
-        //$stmt->bindValue(':id_cours', $cours->getIdCours());
+        //$stmt->bindValue(':id_cours', $cours->getId());
         $stmt->bindValue(':id_eleve', $cours->getIdEleve());
         $stmt->execute();
     }

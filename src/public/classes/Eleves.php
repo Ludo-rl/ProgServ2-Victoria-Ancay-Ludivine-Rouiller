@@ -24,4 +24,10 @@ class Eleves {
     public function getMotDePasseHash(): string {
         return $this->motDePasseHash;
     }
+
+    // "victoria.ancay" devient "Victoria" (pour « Bonjour Victoria »)
+    public function getNomAffiche(): string {
+        $premierePartie = explode(".", $this->identifiant)[0];
+        return ucfirst($premierePartie);
+    }
 }

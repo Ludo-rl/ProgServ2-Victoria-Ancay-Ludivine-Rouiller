@@ -1,44 +1,65 @@
 <?php
-class ElevesManager {
-    public const IDENTIFIANT_LONGUEUR_MAX = 50;
-    public const MOT_DE_PASSE_LONGUEUR_MIN = 8;
+// Toutes les requêtes SQL qui concernent les élèves.
+class EleveManager {
+    private PDO $pdo;
 
-    private ?int $id;               // null tant que l'élève n'est pas enregistré IA (?devant le type)
-    private string $identifiant;
-    private ?string $email;         // facultatif : peut être null IA
-    private string $motDePasseHash;
-
-    public function __construct(string $identifiant, ?string $email, string $motDePasseHash, ?int $id = null) {
-        $this->identifiant = $identifiant;
-        $this->email = $email;
-        $this->motDePasseHash = $motDePasseHash;
-        $this->id = $id;
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
     }
 
-    public function getId(): ?int {
-        return $this->id;
+    // Dit si un identifiant est déjà pris (true ou false)
+    public function identifiantExiste(string $identifiant): bool {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM eleve WHERE identifiant = :identifiant");
+        $stmt->bindValue(':identifiant', $identifiant);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
     }
 
-    public function getIdentifiant(): string {
-        return $this->identifiant;
+    // Ajoute un élève et retourne son id
+    public function creer(Eleves $eleve): int {
+        $sql = "INSERT INTO eleve (identifiant, email, mot_de_passe_hash)
+                VALUES (:identifiant, :email, :hash)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':identifiant', $eleve->getIdentifiant());
+        $stmt->bindValue(':email', $eleve->getEmail());   // null devient NULL en base
+        $stmt->bindValue(':hash', $eleve->getMotDePasseHash());
+        $stmt->execute();
+        return (int) $this->pdo->lastInsertId();
     }
 
-    public function getEmail(): ?string {
-        return $this->email;
+    // Retrouve un élève par son id, sinon null
+    public function trouverParId(int $id): ?Eleves {
+        $stmt = $this->pdo->prepare("SELECT id_eleve, identifiant, email, mot_de_passe_hash FROM eleve WHERE id_eleve = :id");
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
+
+        $ligne = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($ligne === false) {
+            return null;
+        }
+        return new Eleves(
+            $ligne["identifiant"],
+            $ligne["email"],
+            $ligne["mot_de_passe_hash"],
+            (int) $ligne["id_eleve"]
+        );
     }
 
-    public function getMotDePasseHash(): string {
-        return $this->motDePasseHash;
-    }
+    // Retrouve un élève par son identifiant (pour la connexion), sinon null
+    public function trouverParIdentifiant(string $identifiant): ?Eleves {
+        $stmt = $this->pdo->prepare("SELECT id_eleve, identifiant, email, mot_de_passe_hash FROM eleve WHERE identifiant = :identifiant");
+        $stmt->bindValue(':identifiant', $identifiant);
+        $stmt->execute();
 
-    //simplifié nom user 
-    public function getNomAffiche(): string {
-        $premierePartie = explode(".", $this->identifiant)[0];
-        return ucfirst($premierePartie);
-    }
-
-
-    public function getInitiale(): string {
-        return strtoupper(substr($this->identifiant, 0, 1));
+        $ligne = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($ligne === false) {
+            return null;
+        }
+        return new Eleves(
+            $ligne["identifiant"],
+            $ligne["email"],
+            $ligne["mot_de_passe_hash"],
+            (int) $ligne["id_eleve"]
+        );
     }
 }

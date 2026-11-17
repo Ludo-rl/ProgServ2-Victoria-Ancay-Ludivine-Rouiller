@@ -1,33 +1,39 @@
 <?php
-require_once __DIR__ . '/classes/Cours.php';
 require_once __DIR__ . '/classes/GestionDB.php';
+require_once __DIR__ . '/classes/Cours.php';
 require_once __DIR__ . '/classes/CoursManager.php';
+require_once __DIR__ . '/classes/Couleur.php';
+require_once __DIR__ . '/classes/CouleurManager.php';
 
 session_start();
-$_SESSION['id_eleve'] ??= 1;   // TEMPORAIRE active session en attendant vrai connexion
+$_SESSION['id_eleve'] ??= 1;   // TEMPORAIRE
 $idEleve = (int) $_SESSION['id_eleve'];
 
 $gestionDB = new GestionDB();
 $coursManager = new CoursManager($gestionDB->getPdo());
-
-//$repository = $coursManager;
+$couleurManager = new CouleurManager($gestionDB->getPdo());
 
 $couleurs = [];
+$couleursParId = [];   // pour retrouver une couleur à partir de son id
+$idsValides = [];
 $cours = [];
 $erreur = "";
-$nom = "";          // réafficher le formulaire en cas d'erreur
+$nom = "";          // conservés pour réafficher le formulaire en cas d'erreur
 $idCouleur = 0;
 
 try {
-    $couleurs = $coursManager->trouverCouleurs();
-    $idsValides = array_column($couleurs, 'id_couleur');
+    $couleurs = $couleurManager->trouverToutes();
+    foreach ($couleurs as $couleur) {
+        $idsValides[] = $couleur->getId();
+        $couleursParId[$couleur->getId()] = $couleur;
+    }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // NETTOYAGE 
+        // NETTOYAGE : on retire les espaces autour du nom
         $nom = trim($_POST["nom"] ?? "");
         $idCouleur = (int) ($_POST["id_couleur"] ?? 0);
 
-        // val serveur
+        // VALIDATION côté serveur
         if ($nom === "") {
             $erreur = "Renseignez un nom pour créer votre cours.";
         } elseif (mb_strlen($nom) > Cours::NOM_LONGUEUR_MAX) {
@@ -35,18 +41,20 @@ try {
         } elseif (!in_array($idCouleur, $idsValides)) {
             $erreur = "Choisissez une couleur dans la palette.";
         } else {
-            // $coursManager->creer(new Cours($nom, $idEleve, $idCouleur, null));
-            header("Location: cours.php?ok=1"); // IA sert a pas avoir de page blanche
+            $coursManager->create(new Cours($nom, $idEleve, $idCouleur, 0));
+            header("Location: cours.php?ok=1");   // évite le double envoi au rechargement
             exit;
         }
     }
 
-    $cours = $coursManager->trouverParEleve($idEleve);
+    $cours = $coursManager->findByEleve($idEleve);
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) {
+        // Violation de UNIQUE (id_eleve, nom)
         $erreur = "Vous avez déjà un cours avec ce nom.";
-        $cours = $coursManager->trouverParEleve($idEleve);
+        $cours = $coursManager->findByEleve($idEleve);
     } else {
+        // On ne montre jamais le détail technique à l'utilisateur
         error_log($e->getMessage());
         $erreur = "Une erreur est survenue. Réessayez plus tard.";
     }
@@ -60,7 +68,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes cours · Central</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -77,7 +85,7 @@ try {
     <h2>Ajouter un cours</h2>
     <form action="cours.php" method="POST">
         <label for="nom">Nom de la branche</label><br>
-
+        <!-- Validation côté client : confort uniquement, la vraie validation est côté serveur -->
         <input type="text" id="nom" name="nom" required
             maxlength="<?= Cours::NOM_LONGUEUR_MAX ?>"
             value="<?= htmlspecialchars($nom) ?>">
@@ -87,11 +95,11 @@ try {
         <?php foreach ($couleurs as $couleur) { ?>
             <label>
                 <input type="radio" name="id_couleur" required
-                    value="<?= (int) $couleur["id_couleur"] ?>"
-                    <?= (int) $couleur["id_couleur"] === $idCouleur ? "checked" : "" ?>>
+                    value="<?= $couleur->getId() ?>"
+                    <?= $couleur->getId() === $idCouleur ? "checked" : "" ?>>
                 <span style="display:inline-block;width:14px;height:14px;border-radius:50%;
-                             background:<?= htmlspecialchars($couleur["code_hex"]) ?>"></span>
-                <?= htmlspecialchars($couleur["nom"]) ?>
+                             background:<?= htmlspecialchars($couleur->getCodeHex()) ?>"></span>
+                <?= htmlspecialchars($couleur->getNom()) ?>
             </label>
         <?php } ?>
         <br><br>
@@ -105,10 +113,10 @@ try {
     <?php } else { ?>
         <ul>
             <?php foreach ($cours as $unCours) { ?>
-                <li style="border-left:8px solid <?= htmlspecialchars($unCours["code_hex"]) ?>;padding-left:8px">
-                    <strong><?= htmlspecialchars($unCours["nom"]) ?></strong>
-                    · <?= htmlspecialchars($unCours["couleur"]) ?>
-                    · <?= (int) $unCours["nb_resumes"] ?> résumé(s)
+                <?php $couleurDuCours = $couleursParId[$unCours->getIdCouleur()]; ?>
+                <li style="border-left:8px solid <?= htmlspecialchars($couleurDuCours->getCodeHex()) ?>;padding-left:8px">
+                    <strong><?= htmlspecialchars($unCours->getNom()) ?></strong>
+                    · <?= htmlspecialchars($couleurDuCours->getNom()) ?>
                 </li>
             <?php } ?>
         </ul>
