@@ -6,12 +6,13 @@ class Cours {
     private string $nom;
     private int $idEleve;
     private int $idCouleur;
+    private int $id;
 
-    public function __construct(string $nom, int $idCours, int $idEleve, int $idCouleur) {
+    public function __construct(string $nom, int $idEleve, int $idCouleur, int $id = 0) {
         $this->nom = $nom;
-        //$this->idCours = $idCours;
         $this->idEleve = $idEleve;
         $this->idCouleur = $idCouleur;
+        $this->id = $id;
     }
 
     public function getNom(): string {
@@ -24,5 +25,9 @@ class Cours {
 
     public function getIdCouleur(): int {
         return $this->idCouleur;
+    }
+
+    public function getId(): int {
+        return $this->id;
     }
 }

@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Central — partage de l'espace (partage.css)
+   À charger EN PLUS de base.css, uniquement sur les pages concernées.
+   ========================================================================== */
+
+/* ==========================================================================
+   15. Partage de l'espace
+   ========================================================================== */
+/* Formulaire d'invitation : e-mail | rôle | bouton */
+.invite-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+.invite-form .field {
+  margin-bottom: 0;
+}
+
+.invite-form .field__label {
+  font-size: 12px;
+}
+
+.invite-form .input {
+  height: 46px;
+  font-size: 13px;
+}
+
+.invite-note {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.card__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card__header .card__title {
+  font-size: 20px;
+}
+
+.card__meta {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Liste des personnes et invitations */
+.people {
+  margin-top: 18px;
+}
+
+.person {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.person__name {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.person__email {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.person__status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.people + .list-note {
+  margin-top: 4px;
+}
+
+
+
+@media (max-width: 860px) {
+  .invite-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .person {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+
+  .person__status {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+}
