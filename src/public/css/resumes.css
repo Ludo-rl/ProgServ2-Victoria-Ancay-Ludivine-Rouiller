@@ -1,0 +1,222 @@
+/* ==========================================================================
+   Central — liste des résumés (resumes.css)
+   À charger EN PLUS de base.css, uniquement sur les pages concernées.
+   ========================================================================== */
+
+/* Variante : barre latérale d'un cours, teintée de la couleur du cours */
+.sidebar--course {
+  background: var(--course-color, var(--color-sage-tint));
+  border-right: 0;
+  border-radius: 0 var(--radius-l) var(--radius-l) 0;
+}
+
+.sidebar__course-title {
+  margin: 84px 0 70px;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
+  word-break: break-word;
+}
+
+.sidebar--course .sidebar__label {
+  margin-top: 0;
+}
+
+.sidebar--course .nav__item {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--color-sage-tint);
+}
+
+.sidebar--course .nav__item:hover {
+  background: #fff;
+}
+
+
+
+/* ==========================================================================
+   14. Résumés
+   ========================================================================== */
+.layout-resumes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 368px;
+  gap: 24px;
+  align-items: start;
+}
+
+.list-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.list-header__title {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.list-header__count {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.resume-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.resume-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 22px;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-l);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.resume-card:hover {
+  text-decoration: none;
+  border-color: #cfd8cb;
+  box-shadow: 0 4px 14px rgba(38, 59, 52, 0.06);
+}
+
+.resume-card__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-s);
+  color: var(--color-primary);
+  background: var(--color-sage-tint);
+}
+
+.resume-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.resume-card__meta {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.list-note {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Panneau « Ajouter un fichier » */
+.upload-panel__title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-muted);
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-m);
+}
+
+.dropzone .icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
+}
+
+/* Fichier choisi, pas encore envoyé */
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-s);
+}
+
+.file-chip > .icon {
+  color: var(--color-primary);
+}
+
+.file-chip__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-chip__name {
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-chip__state {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.file-chip__remove {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--color-muted);
+  background: none;
+}
+
+.file-chip__remove:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.upload-panel .alert {
+  margin-top: 20px;
+}
+
+
+
+@media (max-width: 1100px) {
+  .layout-resumes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .sidebar--course {
+    border-radius: 0 0 var(--radius-l) var(--radius-l);
+  }
+
+  .sidebar__course-title {
+    order: -1;
+    width: 100%;
+    margin: 4px 0;
+    font-size: 24px;
+    text-align: left;
+  }
+}

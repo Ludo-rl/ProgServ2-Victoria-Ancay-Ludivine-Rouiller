@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Central — connexion et inscription (auth.css)
+   À charger EN PLUS de base.css, uniquement sur les pages concernées.
+   ========================================================================== */
+
+/* ==========================================================================
+   10. Pages de connexion et d'inscription
+   ========================================================================== */
+.auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 48px 24px;
+  background: var(--color-surface);
+}
+
+.auth__panel {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Petit texte vert en capitales au-dessus du titre */
+.eyebrow {
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.auth__title {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.auth__lead {
+  margin: 14px 0 28px;
+  color: var(--color-muted);
+}
+
+.auth__note {
+  margin-top: 16px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.auth__alt {
+  margin-top: 22px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.auth__alt a {
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+
+
+@media (max-width: 860px) {
+  .auth__title {
+    font-size: 28px;
+  }
+}

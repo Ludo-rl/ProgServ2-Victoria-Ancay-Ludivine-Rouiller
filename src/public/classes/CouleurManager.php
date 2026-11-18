@@ -1,4 +1,3 @@
-
 <?php
 // Toutes les requêtes SQL qui concernent les couleurs.
 class CouleurManager {
