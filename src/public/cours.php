@@ -6,8 +6,11 @@ require_once __DIR__ . '/classes/Couleur.php';
 require_once __DIR__ . '/classes/CouleurManager.php';
 
 session_start();
-$_SESSION['id_eleve'] ??= 1;   // TEMPORAIRE
-$idEleve = (int) $_SESSION['id_eleve'];
+if (empty($_SESSION["id_eleve"])) {
+    header("Location: login.php");
+    exit;
+}
+$idEleve = (int) $_SESSION["id_eleve"];
 
 $gestionDB = new GestionDB();
 $coursManager = new CoursManager($gestionDB->getPdo());

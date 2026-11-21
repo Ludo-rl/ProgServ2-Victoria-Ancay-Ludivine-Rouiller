@@ -62,4 +62,12 @@ class EleveManager {
             (int) $ligne["id_eleve"]
         );
     }
+
+    // Modifie l'e-mail d'un élève (null = pas d'e-mail)
+    public function modifierEmail(int $id, ?string $email): void {
+        $stmt = $this->pdo->prepare("UPDATE eleve SET email = :email WHERE id_eleve = :id");
+        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
+    }
 }

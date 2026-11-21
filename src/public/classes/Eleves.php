@@ -1,8 +1,10 @@
 <?php
 class Eleves {
     public const IDENTIFIANT_LONGUEUR_MAX = 50;
+    public const EMAIL_LONGUEUR_MAX = 255;
     public const MOT_DE_PASSE_LONGUEUR_MIN = 8;
 
+    private ?int $id;
     private string $identifiant;
     private ?string $email;
     private string $motDePasseHash;
@@ -11,6 +13,11 @@ class Eleves {
         $this->identifiant = $identifiant;
         $this->email = $email;
         $this->motDePasseHash = $motDePasseHash;
+        $this->id = null;
+    }
+
+    public function getId(): ?int {
+        return $this->id;
     }
 
     public function getIdentifiant(): string {
