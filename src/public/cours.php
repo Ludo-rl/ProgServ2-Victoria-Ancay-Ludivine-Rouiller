@@ -5,7 +5,10 @@ require_once __DIR__ . '/classes/CoursManager.php';
 require_once __DIR__ . '/classes/Couleur.php';
 require_once __DIR__ . '/classes/CouleurManager.php';
 
+
 session_start();
+require_once __DIR__ . '/langue.php';
+
 if (empty($_SESSION["id_eleve"])) {
     header("Location: login.php");
     exit;
@@ -62,9 +65,39 @@ try {
         $erreur = "Une erreur est survenue. Réessayez plus tard.";
     }
 }
+//gestion langues, a chnager de place potentiellement
+if ($nom === "") {
+    $erreur = t("erreur.nom_vide");
+} elseif (mb_strlen($nom) > Cours::NOM_LONGUEUR_MAX) {
+    $erreur = t("erreur.nom_trop_long", Cours::NOM_LONGUEUR_MAX);
+} elseif (!in_array($idCouleur, $idsValides)) {
+    $erreur = t("erreur.couleur");
+}
+// ...
+$erreur = t("erreur.cours_existe");
+// ...
+$erreur = t("erreur.generale");
+
+
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars($langue) ?>">
+
+<h1><?= htmlspecialchars(t("cours.titre")) ?></h1>
+
+<?php if (isset($_GET["ok"])) { ?>
+    <p><?= htmlspecialchars(t("cours.cree")) ?></p>
+<?php } ?>
+
+<h2><?= htmlspecialchars(t("cours.ajouter")) ?></h2>
+<label for="nom"><?= htmlspecialchars(t("cours.nom_label")) ?></label>
+<p><?= htmlspecialchars(t("cours.couleur_label")) ?></p>
+<button type="submit"><?= htmlspecialchars(t("cours.bouton_creer")) ?></button>
+
+<h2><?= htmlspecialchars(t("cours.liste_titre")) ?></h2>
+<?php if (count($cours) === 0) { ?>
+    <p><?= htmlspecialchars(t("cours.aucun")) ?></p>
+<?php } ?>
 
 <head>
     <meta charset="UTF-8">
@@ -73,6 +106,12 @@ try {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
+<nav>
+    <?php foreach (LANGUES_DISPONIBLES as $code => $nomLangue) { ?>
+        <a href="?lang=<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($nomLangue) ?></a>
+    <?php } ?>
+</nav>
 
 <body>
     <h1>Mes cours</h1>
