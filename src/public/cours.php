@@ -5,9 +5,15 @@ require_once __DIR__ . '/classes/CoursManager.php';
 require_once __DIR__ . '/classes/Couleur.php';
 require_once __DIR__ . '/classes/CouleurManager.php';
 
+
 session_start();
-$_SESSION['id_eleve'] ??= 1;   // TEMPORAIRE
-$idEleve = (int) $_SESSION['id_eleve'];
+require_once __DIR__ . '/langue.php';
+
+if (empty($_SESSION["id_eleve"])) {
+    header("Location: login.php");
+    exit;
+}
+$idEleve = (int) $_SESSION["id_eleve"];
 
 $gestionDB = new GestionDB();
 $coursManager = new CoursManager($gestionDB->getPdo());
@@ -66,6 +72,124 @@ $nomAffiche = "Victoria";
 $identifiant = "victoria.ancay";
 require __DIR__ . '/partials/header.php';
 ?>
+//gestion langues, a chnager de place potentiellement
+if ($nom === "") {
+    $erreur = t("erreur.nom_vide");
+} elseif (mb_strlen($nom) > Cours::NOM_LONGUEUR_MAX) {
+    $erreur = t("erreur.nom_trop_long", Cours::NOM_LONGUEUR_MAX);
+} elseif (!in_array($idCouleur, $idsValides)) {
+    $erreur = t("erreur.couleur");
+}
+// ...
+$erreur = t("erreur.cours_existe");
+// ...
+$erreur = t("erreur.generale");
+
+
+?>
+<!DOCTYPE html>
+<html lang="<?= htmlspecialchars($langue) ?>">
+
+<h1><?= htmlspecialchars(t("cours.titre")) ?></h1>
+
+<?php if (isset($_GET["ok"])) { ?>
+    <p><?= htmlspecialchars(t("cours.cree")) ?></p>
+<?php } ?>
+
+<h2><?= htmlspecialchars(t("cours.ajouter")) ?></h2>
+<label for="nom"><?= htmlspecialchars(t("cours.nom_label")) ?></label>
+<p><?= htmlspecialchars(t("cours.couleur_label")) ?></p>
+<button type="submit"><?= htmlspecialchars(t("cours.bouton_creer")) ?></button>
+
+<h2><?= htmlspecialchars(t("cours.liste_titre")) ?></h2>
+<?php if (count($cours) === 0) { ?>
+    <p><?= htmlspecialchars(t("cours.aucun")) ?></p>
+<?php } ?>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes cours · Central</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/cours.css">
+</head>
+
+<nav>
+    <?php foreach (LANGUES_DISPONIBLES as $code => $nomLangue) { ?>
+        <a href="?lang=<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($nomLangue) ?></a>
+    <?php } ?>
+</nav>
+
+<body>
+    <!-- Icônes utilisées dans la page -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+        <symbol id="i-book-open" viewBox="0 0 24 24">
+            <path d="M12 7v14" />
+            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+            <rect width="7" height="7" x="3" y="3" rx="1" />
+            <rect width="7" height="7" x="14" y="3" rx="1" />
+            <rect width="7" height="7" x="14" y="14" rx="1" />
+            <rect width="7" height="7" x="3" y="14" rx="1" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+            <path d="M5 12h14" />
+            <path d="M12 5v14" />
+        </symbol>
+        <symbol id="i-circle-alert" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" x2="12" y1="8" y2="12" />
+            <line x1="12" x2="12.01" y1="16" y2="16" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+            <path d="M20 6 9 17l-5-5" />
+        </symbol>
+    </svg>
+
+    <div class="app">
+
+        <!-- BARRE LATÉRALE -->
+        <aside class="sidebar">
+            <a class="brand" href="cours.php">
+                <span class="brand__logo"><svg class="icon">
+                        <use href="#i-book-open" />
+                    </svg></span>Central
+            </a>
+            <p class="sidebar__label">Mon espace</p>
+            <nav class="nav" aria-label="Navigation principale">
+                <a class="nav__item" href="cours.php" aria-current="page">
+                    <svg class="icon">
+                        <use href="#i-grid" />
+                    </svg>Mes cours
+                </a>
+            </nav>
+            <div class="sidebar__footer">
+                <div class="privacy-note">
+                    <svg class="icon">
+                        <use href="#i-lock" />
+                    </svg>
+                    <strong>Votre espace personnel</strong>
+                    <p>Seuls vos cours et résumés apparaissent ici.</p>
+                </div>
+                <div class="user">
+                    <span class="avatar">V</span>
+                    <div>
+                        <div class="user__name">Victoria</div>
+                        <div class="user__email">victoria.ancay</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENU -->
+        <main class="main">
+            <div class="main__content">
 
 <header class="page-header">
     <div>
