@@ -17,10 +17,11 @@ class EleveManager {
 
     // Ajoute un élève et retourne son id
     public function creer(Eleves $eleve): int {
-        $sql = "INSERT INTO eleve (identifiant, email, mot_de_passe_hash)
-                VALUES (:identifiant, :email, :hash)";
+        $sql = "INSERT INTO eleve (identifiant, prenom, email, mot_de_passe_hash)
+                VALUES (:identifiant, :prenom, :email, :hash)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':identifiant', $eleve->getIdentifiant());
+        $stmt->bindValue(':prenom', $eleve->getNomAffiche());   // colonne NOT NULL : on déduit le prénom de l'identifiant
         $stmt->bindValue(':email', $eleve->getEmail());   // null devient NULL en base
         $stmt->bindValue(':hash', $eleve->getMotDePasseHash());
         $stmt->execute();
