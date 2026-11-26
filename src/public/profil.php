@@ -4,6 +4,7 @@ require_once __DIR__ . '/classes/Eleves.php';
 require_once __DIR__ . '/classes/ElevesManager.php';
 
 session_start();
+require_once __DIR__ . '/langue.php';
 
 // Page réservée aux élèves connectés
 if (empty($_SESSION["id_eleve"])) {
@@ -13,10 +14,11 @@ if (empty($_SESSION["id_eleve"])) {
 $idEleve = (int) $_SESSION["id_eleve"];
 
 $gestionDB = new GestionDB();
-$elevesManager = new ElevesManager($gestionDB->getPdo());
+$elevesManager = new EleveManager($gestionDB->getPdo());
 
 $erreur = "";
 $identifiant = "";
+$nomAffiche = "";
 $email = "";   // conservé pour réafficher le formulaire en cas d'erreur
 
 try {
@@ -30,6 +32,7 @@ try {
     }
 
     $identifiant = $eleve->getIdentifiant();
+    $nomAffiche = $eleve->getNomAffiche();
     $email = $eleve->getEmail() ?? "";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -38,7 +41,7 @@ try {
 
         // VALIDATION côté serveur (l'e-mail est facultatif)
         if ($email !== "" && (mb_strlen($email) > Eleves::EMAIL_LONGUEUR_MAX || !filter_var($email, FILTER_VALIDATE_EMAIL))) {
-            $erreur = "Cette adresse e-mail n'est pas valide.";
+            $erreur = t("profil.erreur_email");
         } else {
             $elevesManager->modifierEmail($idEleve, $email === "" ? null : $email);
             header("Location: profil.php?ok=1");   // évite le double envoi au rechargement
@@ -48,57 +51,137 @@ try {
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) {
         // Violation de UNIQUE (email)
-        $erreur = "Cette adresse e-mail est déjà utilisée.";
+        $erreur = t("profil.erreur_email_pris");
     } else {
         error_log($e->getMessage());
-        $erreur = "Une erreur est survenue. Réessayez plus tard.";
+        $erreur = t("erreur.generale");
     }
 }
+
+// Variables lues par partials/header.php
+$titrePage = t("profil.titre");
+$menuActif = "profil";
+$cssPage = "profil";
+require __DIR__ . '/partials/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon profil · Central</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
-    <link rel="stylesheet" href="css/style.css">
-</head>
+<!-- Icônes propres à cette page -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-at-sign" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" />
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24">
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </symbol>
+    <symbol id="i-key" viewBox="0 0 24 24">
+        <path d="m21 2-9.6 9.6" />
+        <circle cx="7.5" cy="15.5" r="5.5" />
+        <path d="m15.5 7.5 3 3L22 7l-3-3" />
+    </symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24">
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+    </symbol>
+</svg>
 
-<body>
-    <h1>Mon profil</h1>
-    <p>Les informations de votre compte, simplement.</p>
+<header class="page-header">
+    <div>
+        <nav class="breadcrumb" aria-label="<?= htmlspecialchars(t("profil.fil_ariane")) ?>"><?= htmlspecialchars(t("nav.espace")) ?> / <?= htmlspecialchars(t("nav.profil")) ?></nav>
+        <h1 class="page-title"><?= htmlspecialchars(t("profil.titre")) ?></h1>
+        <p class="page-lead"><?= htmlspecialchars(t("profil.sous_titre")) ?></p>
+    </div>
+</header>
 
-    <?php if (isset($_GET["ok"])) { ?>
-        <p>Vos informations ont été enregistrées.</p>
-    <?php } ?>
+<section class="banner">
+    <span class="banner__avatar"><?= htmlspecialchars(mb_strtoupper(mb_substr($nomAffiche, 0, 1))) ?></span>
+    <div class="banner__body">
+        <h2 class="banner__title"><?= htmlspecialchars($nomAffiche) ?></h2>
+        <p class="banner__text"><?= htmlspecialchars($identifiant) ?></p>
+    </div>
+    <span class="pill"><svg class="icon">
+            <use href="#i-user" />
+        </svg><?= htmlspecialchars(t("profil.compte_eleve")) ?></span>
+</section>
 
-    <?php if ($erreur !== "") { ?>
-        <p style="color:#B03A2E"><?= htmlspecialchars($erreur) ?></p>
-    <?php } ?>
+<div class="layout-2col">
+    <section class="card">
+        <h2 class="card__title"><?= htmlspecialchars(t("profil.infos_titre")) ?></h2>
 
-    <h2>Informations du compte</h2>
-    <form action="profil.php" method="POST">
-        <label for="identifiant">Identifiant unique</label><br>
-        <input type="text" id="identifiant" value="<?= htmlspecialchars($identifiant) ?>" disabled>
-        <br>
-        <small>Votre identifiant est utilisé pour vous connecter.</small>
-        <br><br>
+        <?php if (isset($_GET["ok"])) { ?>
+            <div class="alert alert--info" role="status">
+                <svg class="icon">
+                    <use href="#i-check" />
+                </svg>
+                <div><span class="alert__title"><?= htmlspecialchars(t("profil.enregistre")) ?></span></div>
+            </div>
+        <?php } ?>
 
-        <label for="email">Adresse e-mail</label> <small>facultative</small><br>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
-        <br>
-        <small>Cette adresse permet la récupération du mot de passe.</small>
-        <br><br>
+        <?php if ($erreur !== "") { ?>
+            <div class="alert alert--danger" role="alert">
+                <svg class="icon">
+                    <use href="#i-circle-alert" />
+                </svg>
+                <div><span class="alert__title"><?= htmlspecialchars($erreur) ?></span></div>
+            </div>
+        <?php } ?>
 
-        <p>Mot de passe : défini à la création du compte. Il n'est jamais affiché.</p>
+        <div class="info-item">
+            <svg class="icon">
+                <use href="#i-at-sign" />
+            </svg>
+            <div>
+                <p class="info-item__label"><?= htmlspecialchars(t("profil.identifiant")) ?></p>
+                <p class="info-item__value"><?= htmlspecialchars($identifiant) ?></p>
+                <p class="info-item__help"><?= htmlspecialchars(t("profil.identifiant_aide")) ?></p>
+            </div>
+        </div>
 
-        <button type="submit">Enregistrer</button>
-        <a href="cours.php">Retour à mes cours</a>
-    </form>
+        <div class="info-item">
+            <svg class="icon">
+                <use href="#i-mail" />
+            </svg>
+            <div>
+                <p class="info-item__label"><?= htmlspecialchars(t("profil.email")) ?></p>
+                <form class="info-form" action="profil.php" method="POST" novalidate>
+                    <input class="input<?= $erreur !== "" ? " is-invalid" : "" ?>" type="email" id="email" name="email"
+                        maxlength="<?= Eleves::EMAIL_LONGUEUR_MAX ?>"
+                        aria-label="<?= htmlspecialchars(t("profil.email")) ?>"
+                        placeholder="<?= htmlspecialchars(t("profil.email_placeholder")) ?>"
+                        value="<?= htmlspecialchars($email) ?>">
+                    <button class="btn btn--primary" type="submit"><?= htmlspecialchars(t("profil.enregistrer")) ?></button>
+                </form>
+                <p class="info-item__help"><?= htmlspecialchars(t("profil.email_aide")) ?></p>
+            </div>
+        </div>
 
-    <p><a href="logout.php">Se déconnecter</a></p>
-</body>
+        <div class="info-item">
+            <svg class="icon">
+                <use href="#i-key" />
+            </svg>
+            <div>
+                <p class="info-item__label"><?= htmlspecialchars(t("profil.mot_de_passe")) ?></p>
+                <p class="info-item__value"><?= htmlspecialchars(t("profil.mdp_valeur")) ?></p>
+                <p class="info-item__help"><?= htmlspecialchars(t("profil.mdp_aide", Eleves::MOT_DE_PASSE_LONGUEUR_MIN)) ?></p>
+            </div>
+        </div>
+    </section>
 
-</html>
+    <aside class="stack">
+        <div class="aside-card">
+            <svg class="icon">
+                <use href="#i-lock" />
+            </svg>
+            <h2 class="aside-card__title"><?= htmlspecialchars(t("profil.perso_titre")) ?></h2>
+            <p><?= htmlspecialchars(t("profil.perso_texte")) ?></p>
+        </div>
+        <a class="btn btn--outline btn--block" href="cours.php">
+            <svg class="icon">
+                <use href="#i-arrow-left" />
+            </svg><?= htmlspecialchars(t("profil.retour")) ?>
+        </a>
+    </aside>
+</div>
+
+<?php require __DIR__ . '/partials/footer.php'; ?>

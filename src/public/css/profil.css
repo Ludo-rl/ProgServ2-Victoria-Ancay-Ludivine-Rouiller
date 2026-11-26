@@ -50,3 +50,30 @@
   width: 14px;
   height: 14px;
 }
+
+/* Formulaire de l'adresse e-mail : champ + bouton sur la même ligne */
+.info-form {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.info-form .input {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .info-form {
+    flex-direction: column;
+  }
+}
+
+/* Message de confirmation / d'erreur sous le titre de la carte */
+.card .alert {
+  margin: 14px 0 0;
+}
+
+.card .info-item:last-of-type {
+  border-bottom: 0;
+}

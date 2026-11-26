@@ -9,11 +9,11 @@ class Eleves {
     private ?string $email;
     private string $motDePasseHash;
 
-    public function __construct(string $identifiant, ?string $email, string $motDePasseHash) {
+    public function __construct(string $identifiant, ?string $email, string $motDePasseHash, ?int $id = null) {
         $this->identifiant = $identifiant;
         $this->email = $email;
         $this->motDePasseHash = $motDePasseHash;
-        $this->id = null;
+        $this->id = $id;
     }
 
     public function getId(): ?int {

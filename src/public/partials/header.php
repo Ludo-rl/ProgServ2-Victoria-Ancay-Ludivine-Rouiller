@@ -9,12 +9,12 @@
 //   $identifiant : identifiant affiché sous le prénom
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars($langue ?? "fr") ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titrePage) ?> · Central</title>
+    <title><?= htmlspecialchars($titrePage ?? "Central") ?> · Central</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/<?= htmlspecialchars($cssPage) ?>.css">
@@ -53,6 +53,11 @@
         <symbol id="i-check" viewBox="0 0 24 24">
             <path d="M20 6 9 17l-5-5" />
         </symbol>
+        <symbol id="i-log-out" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" x2="9" y1="12" y2="12" />
+        </symbol>
     </svg>
 
     <div class="app">
@@ -75,6 +80,11 @@
                     <svg class="icon">
                         <use href="#i-user" />
                     </svg>Profil
+                </a>
+                <a class="nav__item" href="logout.php">
+                    <svg class="icon">
+                        <use href="#i-log-out" />
+                    </svg>Se déconnecter
                 </a>
             </nav>
             <div class="sidebar__footer">
